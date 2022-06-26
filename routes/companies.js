@@ -20,6 +20,8 @@ router.get("/", async (req, res, next) => {
 GET /companies/[code]
     Return obj of company: {company: {code, name, description}}
     If the company given cannot be found, this should return a 404 status response.
+    Route updated:
+    Return obj of company: {company: {code, name, description, invoices: [id, ...]}}
 */
 router.get("/:code", async (req, res, next) => {
     try{
@@ -27,8 +29,19 @@ router.get("/:code", async (req, res, next) => {
         if(results.rows.length === 0){
             throw new ExpressError("Company not found", 404);
         }
+        let { code, name, description } = results.rows[0];
+        
+        const invoices_results = await db.query(`SELECT id FROM invoices WHERE comp_code = $1`, [req.params.code]);
+        let invoices = [];
+        if(invoices_results.rows.length > 0){
+            invoices_results.rows.forEach((value, idx) => {
+                invoices.push(value.id);
+            });
+        }else{
+            invoices.push("The company don't have invoices");
+        }
 
-        return res.json({ company:  results.rows[0] });
+        return res.json({ company: { code, name, description, invoices } });
     } catch(err){
         return next(err);
     }

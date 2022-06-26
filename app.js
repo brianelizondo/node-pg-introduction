@@ -6,8 +6,12 @@ const ExpressError = require("./expressError");
 app.use(express.json());
 
 /** Routes for companies url */
-const companiesRoutes = require("./routes/companies")
+const companiesRoutes = require("./routes/companies");
 app.use("/companies", companiesRoutes);
+
+/** Routes for invoices url */
+const invoicesRoutes = require("./routes/invoices");
+app.use("/invoices", invoicesRoutes);
 
 
 
